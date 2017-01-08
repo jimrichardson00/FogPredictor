@@ -6,7 +6,7 @@ require(randomForest)
 require(parallel)
 
 # set working directory
-setwd("/home/jim/Dropbox/R/randomforest_fog")
+setwd("/home/jim/Dropbox/R/FogPredictor")
 
 # set number of cross validations
 N <- 100
@@ -297,24 +297,24 @@ results <- foreach(i = seq(1, N, 1)) %dopar% {
       }
       head(rndf_result)
 
-      # train naive bayes on training data
-      require(klaR)
-      nbay <- NaiveBayes(formula = as.formula(paste("factor(", Output, ")", "~", paste(Inputs_n, collapse = "+")))
-        , data = data_tra
-        , prior = rep(1/length(unique(data_tra[, Outputs])), length(unique(data_tra[, Outputs])))
-        )
-      # run classifier on test data, and store result
-      posterior <- as.data.frame(predict(object = nbay, newdata = data_tes[, Inputs])$posterior)
-      class <- as.data.frame(predict(object = nbay, newdata = data_tes[, Inputs])$class)
-      posterior[is.na(posterior[, names(posterior)[1]]) == TRUE, names(posterior)[1]] <- ifelse(class[is.na(posterior[, names(posterior)[1]]) == TRUE, 1] == names(posterior[1]), 1, 0) 
-      posterior[is.na(posterior[, names(posterior)[2]]) == TRUE, names(posterior)[2]] <- ifelse(class[is.na(posterior[, names(posterior)[2]]) == TRUE, 1] == names(posterior[2]), 1, 0) 
-      output <- as.data.frame(posterior)
-      names(output) <- paste(Output, names(output), sep = "")
-      for(Output_f_o in Outputs_f) {
-        nbay_result[, Output_f_o] <- output[, Output_f_o]
-      }
-      nbay_result
-    }
+    #   # train naive bayes on training data
+    #   require(klaR)
+    #   nbay <- NaiveBayes(formula = as.formula(paste("factor(", Output, ")", "~", paste(Inputs_n, collapse = "+")))
+    #     , data = data_tra
+    #     , prior = rep(1/length(unique(data_tra[, Outputs])), length(unique(data_tra[, Outputs])))
+    #     )
+    #   # run classifier on test data, and store result
+    #   posterior <- as.data.frame(predict(object = nbay, newdata = data_tes[, Inputs])$posterior)
+    #   class <- as.data.frame(predict(object = nbay, newdata = data_tes[, Inputs])$class)
+    #   posterior[is.na(posterior[, names(posterior)[1]]) == TRUE, names(posterior)[1]] <- ifelse(class[is.na(posterior[, names(posterior)[1]]) == TRUE, 1] == names(posterior[1]), 1, 0) 
+    #   posterior[is.na(posterior[, names(posterior)[2]]) == TRUE, names(posterior)[2]] <- ifelse(class[is.na(posterior[, names(posterior)[2]]) == TRUE, 1] == names(posterior[2]), 1, 0) 
+    #   output <- as.data.frame(posterior)
+    #   names(output) <- paste(Output, names(output), sep = "")
+    #   for(Output_f_o in Outputs_f) {
+    #     nbay_result[, Output_f_o] <- output[, Output_f_o]
+    #   }
+    #   nbay_result
+    # }
 
     # train crude mode classifier on training data
     data_tra_c <- collapse(Outputs = Outputs, Outputs_f = Outputs_f, result = data_tra[, Outputs_f])
