@@ -216,13 +216,6 @@ Image_distance <- function(video_file_frame1, video_file_frame2) {
   return(dist)
 }
 
-# Outputs = Outputs 
-# Outputs_f = Outputs_f
-# P_var = P_var
-# P_val = P_val
-# result = rndf_result
-
-
 collapse <- function(Outputs, Outputs_f, result, P_var = NA, P_val = 0.5) {
 
   if(is.na(P_val) == TRUE) {
@@ -260,18 +253,18 @@ collapse <- function(Outputs, Outputs_f, result, P_var = NA, P_val = 0.5) {
 
     if(is.na(P_var) == TRUE) {
 
-      result_collapse[, o] <- result_o_max
+    	result_collapse[, o] <- result_o_max
 
     } else {
 
-      result_collapse[, o] <- ifelse(result_o[, paste(Output, P_var, sep = "")] >= P_val, 
-        paste(Output, P_var, sep = ""),
-        result_o_max
-        )
+			result_collapse[, o] <- ifelse(result_o[, paste(Output, P_var, sep = "")] >= P_val, 
+    		paste(Output, P_var, sep = ""),
+    		result_o_max
+    		)
 
-    }
+		}
 
-  }
+	}
 
   result_collapse <- as.data.frame(result_collapse)
   names(result_collapse) <- Outputs
@@ -279,18 +272,13 @@ collapse <- function(Outputs, Outputs_f, result, P_var = NA, P_val = 0.5) {
 
 }
 
-# Output = Outputs[o]
-# results = results_nn
-# var2 = "arnn_result"
-# var1 = "data_result"
-
 confusion <- function(i, Output, results, var1 = "data_result", var2) {
 
   Outputs_f_o <- na.omit(str_match(Outputs_f, paste(Output, ".+", sep = "")))
   Outputs_f_o
 
-  Var1 <- results[[i]][[var1]][Output]
-  Var2 <- results[[i]][[var2]][Output]
+  Var1 <- results[[i]][[var1]][, Output]
+  Var2 <- results[[i]][[var2]][, Output]
 
   tab <- table(results[[i]][[var1]][, Output], results[[i]][[var2]][, Output])
   tab <- as.data.frame(tab)
@@ -306,12 +294,7 @@ confusion <- function(i, Output, results, var1 = "data_result", var2) {
     df <- df[, order(names(df))]
   }
 
-  require(reshape2)
-  dcast(df, Var1 ~ Var2, value.var = "Freq")[, Outputs_f_o]
-
-
-  return(dcast(df, Var1 ~ Var2, value.var = "Freq")[, Outputs_f_o])
- 
+  return(df)
 }
 
 per_correct <- function(confusion) {
