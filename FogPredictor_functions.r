@@ -71,9 +71,10 @@ collapse <- function(Outputs, Outputs_f, result, P_var = NA, P_val = 0.5) {
     result_o <- as.data.frame(result_o)
     result_o
 
-    result_o_max.idx <- which(result_o == apply(result_o, MARGIN = 1, FUN = max), arr.in=TRUE)
+    result_o_max.idx <- which(result_o == apply(result_o, MARGIN = 1, FUN = max), arr.in = TRUE)
     result_o_max.idx <- result_o_max.idx[order(result_o_max.idx[, 1]), ]
     result_o_max.idx <- as.data.frame(result_o_max.idx)
+    result_o_max.idx
 
     require(plyr)
     result_o_max.idx <- ddply(.data = result_o_max.idx, .variables = .(row),
@@ -146,3 +147,38 @@ per_correct <- function(confusion) {
   return( sum(diag(confusion)) / sum(confusion) )
 }
 
+dir_to_compass <- function(drct) {
+
+  if(as.numeric(drct) >= 348.75 & as.numeric(drct) < 11.25) 
+    {drct_f <- "N"} 
+    else if(as.numeric(drct) >= 11.25 & as.numeric(drct) < 33.75) 
+      {drct_f <- "NNE"}
+    else if(as.numeric(drct) >= 33.75 & as.numeric(drct) < 56.25) 
+      {drct_f <- "NE"}
+    else if(as.numeric(drct) >= 56.25 & as.numeric(drct) < 78.75) 
+      {drct_f <- "ENE"}
+    else if(as.numeric(drct) >= 78.75 & as.numeric(drct) < 101.25) 
+      {drct_f <- "E"}
+    else if(as.numeric(drct) >= 101.25 & as.numeric(drct) < 123.75) 
+      {drct_f <- "ESE"}
+    else if(as.numeric(drct) >= 123.75 & as.numeric(drct) < 146.25) 
+      {drct_f <- "SE"}
+    else if(as.numeric(drct) >= 146.25 & as.numeric(drct) < 168.75) 
+      {drct_f <- "SSE"}
+    else if(as.numeric(drct) >= 168.75 & as.numeric(drct) < 191.25) 
+      {drct_f <- "S"}
+    else if(as.numeric(drct) >= 191.25 & as.numeric(drct) < 213.75) 
+      {drct_f <- "SSW"}
+    else if(as.numeric(drct) >= 213.75 & as.numeric(drct) < 236.25) 
+      {drct_f <- "SW"}
+    else if(as.numeric(drct) >= 236.25 & as.numeric(drct) < 258.75) 
+      {drct_f <- "WSW"}
+    else if(as.numeric(drct) >= 258.75 & as.numeric(drct) < 281.25) 
+      {drct_f <- "W"}
+    else if(as.numeric(drct) >= 281.25 & as.numeric(drct) < 303.75) 
+      {drct_f <- "WNW"}
+    else if(as.numeric(drct) >= 303.75 & as.numeric(drct) < 326.25) 
+      {drct_f <- "NW"}
+    else (as.numeric(drct) >= 326.25 & as.numeric(drct) < 348.75) 
+      {drct_f <- "NNW"}
+    }
