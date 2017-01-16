@@ -22,7 +22,7 @@ station = "YPPH"
 P = data.frame( 
   P_Outputs = c("FG_or_BR") 
   , P_var = c("1") 
-  , P_val = c(0.3) 
+  , P_val = c(0.5) 
   ) 
 
 # sets cores as n_cores = number of available cores - 1
@@ -32,7 +32,8 @@ require(doParallel)
 registerDoParallel(cores = n_cores)
 
 # sets Variables, numeric Variables_n, and factor Variables_f
-Outputs = "FG_or_BR"
+presentwx = c("FG", "BR")
+Outputs = paste(presentwx, collapse = "_or_")
 Variables = c("tmpf", "dwpf", "relh", "drct", "sknt", "p01i", "alti", "mslp", "vsby", "gust", "skyc1", "skyc2", "skyc3", "skyc4", "skyl1", "skyl2", "skyl3", "skyl4", "presentwx", "year", "month", "day", "hour", "minute")
 Variables_n = c("tmpf", "dwpf", "relh", "drct", "sknt", "p01i", "alti", "mslp", "vsby", "gust", "skyl1", "skyl2", "skyl3", "skyl4")
 Variables_f = Variables[!(Variables %in% Variables_n)]
@@ -43,6 +44,11 @@ print("Sourcing FogPredictor_functions.r")
 source('FogPredictor_functions.r')
 
 # ---------------------------------
+# runs load metar
+load_metar = TRUE
+source("FogPredictor_metar.r")
+
+# ---------------------------------
 # runs load data
 
 # sets split_hour
@@ -50,41 +56,58 @@ split_hour = 3
 # sets lead time, in hours
 lead_time = 2
 # sets whether or not to load data_train, or calculate it from METAR
-load_data = TRUE
+load_data = FALSE
 
 # load data
 print("Sourcing FogPredictor_data.r")
 source("FogPredictor_data.r")
 
-stations <- c("YPPH", "YBBN", "YMML", "YMHB", "YPAD")
-for(station in stations) {
-  load_data = TRUE
-  station = station
-  print(station)
-  print("Sourcing FogPredictor_data.r")
-  source("FogPredictor_data.r")
-  load_data = TRUE
-}
-
-# ---------------------------------
-# run training file
+# # ---------------------------------
+# # run training file
 
 # set number of cross validations
-N = 1
+N = 100
 print("Sourcing FogPredictor_training.r")
 source("FogPredictor_training.r")
 
-stations <- c("YPPH", "YBBN", "YMML", "YMHB", "YPAD")
+# ---------------------------------
+# loop on stations and lead_time
+station = "YBBN"
+lead_time = 1
+
+stations = c("YPPH", "YBBN", "YMML", "YSSY", "YMHB", "YPAD")
+
 for(station in stations) {
-  station = station
-  load_data = TRUE
-  print(station)
-  print("Sourcing FogPredictor_data.r")
-  source("FogPredictor_data.r")
-  print("Sourcing FogPredictor_training.r")
-  source("FogPredictor_training.r")
-  print("")
+
+  print(paste("Station: ", station, sep = ""))
+
+  print("Sourcing FogPredictor_metar.r")
+  load_metar = TRUE
+  source("FogPredictor_metar.r")
+
+  for(lead_time in seq(1, 9, 1)) {
+
+    # tryCatch({
+
+    # # save data_train
+    #   load(file = paste("data_train", station, lead_time, ".RData", sep = ""))
+    #   # save data_train
+    #   save(data_train, file = paste("data_train", station, formatC(as.integer(lead_time), width = 2, flag = "0"), ".RData", sep = ""))
+
+    #   },
+    #   error = function(e) {cat("ERROR :",conditionMessage(e), "\n")}
+    #   )
+
+    print(paste("Station: ", station, " Lead time: ", lead_time, sep = ""))
+
+    print("Sourcing FogPredictor_data.r")
+    load_data = TRUE
+    source("FogPredictor_data.r")
+
+    print("Sourcing FogPredictor_training.r")
+    source("FogPredictor_training.r")
+
+    print("")
+  }
 }
-
-
 
