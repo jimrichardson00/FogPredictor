@@ -14,7 +14,7 @@ master_dir = "/home/jim/Dropbox/R/FogPredictor"
 setwd(master_dir)
 
 # load data_train
-load(file = paste("data_train", station, ".RData", sep = ""))
+load(file = paste("data_train", station, formatC(as.integer(lead_time), width = 2, flag = "0"), ".RData", sep = ""))
 
 
 # ---------------------------------------------
@@ -38,6 +38,14 @@ data_train[, Output] <- as.numeric(data_train[, Output])
 
 # -------------------------------------
 # sets formulas used in machine learning algorithms
+
+# sets Variables, numeric Variables_n, and factor Variables_f
+Outputs = "FG_or_BR"
+Variables = c("tmpf", "dwpf", "relh", "drct", "sknt", "p01i", "alti", "mslp", "vsby", "gust", "skyc1", "skyc2", "skyc3", "skyc4", "skyl1", "skyl2", "skyl3", "skyl4", "presentwx")
+Variables_n = c("tmpf", "dwpf", "relh", "drct", "sknt", "p01i", "alti", "mslp", "vsby", "gust", "skyl1", "skyl2", "skyl3", "skyl4")
+Variables_f = Variables[!(Variables %in% Variables_n)]
+
+
 
 # sets inputs as Variables with lead time (or hour, minute)
 require(stringr)
@@ -74,33 +82,34 @@ rndf <- randomForest(as.formula(paste("factor(", Output, ")", "~", paste(Inputs,
   , strata = factor(rep(unique(data_train[, Outputs]), nrow(data_train)))
   )
 rndf
-rndf.robust <- randomForest(as.formula(paste("factor(", Output, ")", "~", paste(Inputs, collapse = "+")))
-  , data = data_train
-  , ntree = 5000
-  , sampsize = 25
-  , mtry = 4
-  , keep.inbag = TRUE
-  , keep.forest = TRUE
-  , replace = TRUE
-  , strata = factor(rep(unique(data_train[, Outputs]), nrow(data_train)))
-  )
-rndf.robust
-rndf.default <- randomForest(as.formula(paste("factor(", Output, ")", "~", paste(Inputs, collapse = "+")))
-  , data = data_train
-  , ntree = 5000
-  , replace = TRUE
-  , strata = factor(rep(unique(data_train[, Outputs]), nrow(data_train)))
-  )
-rndf.default
+
+# rndf.robust <- randomForest(as.formula(paste("factor(", Output, ")", "~", paste(Inputs, collapse = "+")))
+#   , data = data_train
+#   , ntree = 5000
+#   , sampsize = 25
+#   , mtry = 4
+#   , keep.inbag = TRUE
+#   , keep.forest = TRUE
+#   , replace = TRUE
+#   , strata = factor(rep(unique(data_train[, Outputs]), nrow(data_train)))
+#   )
+# rndf.robust
+
+# rndf.default <- randomForest(as.formula(paste("factor(", Output, ")", "~", paste(Inputs, collapse = "+")))
+#   , data = data_train
+#   , ntree = 5000
+#   , replace = TRUE
+#   , strata = factor(rep(unique(data_train[, Outputs]), nrow(data_train)))
+#   )
+# rndf.default
 
 
-?randomForest
 #plot crosvalidated predictive performance
 require(pROC)
-plot(roc(rndf$votes[,2], data_train$FG_or_BR), col = 4)
+plot(roc(data_train$FG_or_BR, rndf$votes[,2]), col = 4)
 
 # print accuracy
-print(auc(roc(rndf$votes[, 2], data_train$FG_or_BR)))
+print(auc(roc(data_train$FG_or_BR, rndf$votes[, 2])))
 
 # forrest flor
 require(forestFloor)
